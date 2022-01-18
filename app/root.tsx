@@ -1,6 +1,7 @@
 import {
   ErrorBoundaryComponent,
   Form,
+  Link,
   Links,
   LiveReload,
   LoaderFunction,
@@ -43,15 +44,23 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-gray-800 w-full h-screen flex justify-center items-center">
+      <body className="bg-gray-800 w-full h-full min-h-screen flex justify-center items-center">
         {data.user && (
-          <Form
-            className="absolute text-white top-5 right-5"
-            action="/logout"
-            method="post"
-          >
-            <button type="submit">Logout</button>
-          </Form>
+          <div className="flex absolute text-white top-5 right-5 items-center">
+            <Link to="/" className="m-2">
+              Home
+            </Link>
+            <Link to="/shortlinks" className="m-2">
+              Shortlinks
+            </Link>
+            <Form
+              action="/logout"
+              method="post"
+              className="m-2 bg-gray-700 p-4"
+            >
+              <button type="submit">Logout</button>
+            </Form>
+          </div>
         )}
         <Outlet />
         <ScrollRestoration />
