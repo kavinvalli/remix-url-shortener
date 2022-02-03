@@ -6,6 +6,7 @@ import {
   LoaderFunction,
   redirect,
   useActionData,
+  useCatch,
   useLoaderData,
 } from "remix";
 import Authenticated from "~/components/home/authenticated";
@@ -15,6 +16,7 @@ import { authenticator } from "~/services/auth.server";
 import { getSession } from "~/services/session.server";
 import toast, { Toaster } from "react-hot-toast";
 import { db } from "~/utils/db.server";
+import { CatchBoundaryComponent } from "@remix-run/react/routeModules";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await authenticator.isAuthenticated(request);
@@ -68,6 +70,12 @@ function validateTarget(target: unknown) {
 }
 
 export const action: ActionFunction = async ({ request }) => {
+  const user = await authenticator.isAuthenticated(request);
+  if (!user) {
+    throw new Response("You're not authorized to create a shortlink", {
+      status: 401,
+    });
+  }
   const form = await request.formData();
   const slug = form.get("slug");
   const target = form.get("target");
@@ -120,6 +128,14 @@ export default function Index() {
     </>
   );
 }
+
+export const CatchBoundary: CatchBoundaryComponent = () => {
+  const caught = useCatch();
+  if (caught.status === 401) {
+    return <p>{caught.data}</p>;
+  }
+  return <div>Something went wrong</div>;
+};
 
 export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
   return <div>{error}</div>;
